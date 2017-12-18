@@ -1,0 +1,95 @@
+---
+title: "assignment 3"
+author: "Dan Yuan new version"
+date: "2017年10月26日"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+install.packages("ggplot2") #If this doesn't work, use the "Packages" tab to install the package.
+
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+```
+
+```{r}
+K1 <- Class_Motivation
+```
+
+```{r}
+K2 <- dplyr::select(K1, 2:6)
+```
+
+```{r}
+K3 <- na.omit(K2) #This command create a data frame with only those people with no missing values. It "omits" all rows with missing values, also known as a "listwise deletion". EG - It runs down the list deleting rows as it goes.
+```
+
+```{r}
+K3 <- scale(K3)
+```
+```{r}
+fit <- kmeans(K3, 2)
+```
+
+```{r}
+fit$cluster
+```
+
+```{r}
+K4 <- data.frame(K3, fit$cluster)
+```
+
+```{r}
+names(K4) <- c("1", "2", "3", "4", "5", "cluster")
+```
+
+```{r}
+K5 <- tidyr::gather(K4, "week", "motivation", 1:5)
+```
+
+```{r}
+K6 <- K5 %>% group_by(week, cluster)
+K6 <- summarise(K6, avg = mean(motivation))
+```
+```{r}
+K6$week <- as.numeric(K6$week)
+```
+
+```{r}
+K6$cluster <- as.factor(K6$cluster)
+```
+
+```{r}
+ggplot(K6, aes(week, avg, colour = cluster)) + geom_line() + xlab("Week") + ylab("Average Motivation")
+
+```
+
+```{r}
+K7 <- dplyr::count(K4, cluster)
+```
+
